@@ -18,7 +18,6 @@ def search_employees_service(params: EmployeeSearchParams, db: Session):
 
     # 
     return repository.search(
-        company_id=params.company_id,
         filters=filters,
         skip=(params.page - 1) * params.size,
         limit=params.size
