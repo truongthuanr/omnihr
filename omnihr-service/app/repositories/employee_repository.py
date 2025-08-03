@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from sqlalchemy.dialects import mysql
 
 from app.models.model import Employee
+from app.servicelog.servicelog import logger
 
 
 class EmployeeRepository:
@@ -60,6 +62,10 @@ class EmployeeRepository:
             query = query.filter(Employee.location_id == location_id)
         if status_id := filters.get("status_id"):
             query = query.filter(Employee.status_id == status_id)
-
+        
+        _compiled = query.statement.compile(dialect=mysql.dialect(),compile_kwargs={"literal_binds": True})
+        logger.info(f"Create SQL: {_compiled}")
+                                                                                    
+                                                                                
         return query.offset(skip).limit(limit).all()
 
