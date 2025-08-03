@@ -2,6 +2,9 @@
 
 MySQL
 
+## Create network
+docker create network omnihr-net
+
 ## Create db
 * Start DB containers,  docker-compose.db.yml is put in ./miscellaneous
 

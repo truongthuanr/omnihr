@@ -1,6 +1,8 @@
+# services/employee_service.py
 from sqlalchemy.orm import Session
-from api.employee_router import EmployeeSearchParams
-from repositories.employee_repository import EmployeeRepository
+
+from app.api.employee_param import EmployeeSearchParams
+from app.repositories.employee_repository import EmployeeRepository
 
 
 def search_employees_service(params: EmployeeSearchParams, db: Session):
@@ -14,7 +16,7 @@ def search_employees_service(params: EmployeeSearchParams, db: Session):
         "company_id": params.company_id
     }
 
-    # company_id không bắt buộc → truyền riêng
+    # 
     return repository.search(
         company_id=params.company_id,
         filters=filters,

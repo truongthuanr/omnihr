@@ -1,32 +1,15 @@
-from fastapi import APIRouter, Depends, Query
+# api/employee_router.py
+
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from typing import Optional, List
-from schemas.employee import EmployeeRead
-from services.employee import search_employees_service
-from database import get_db
+from typing import List
+
+from app.schemas.employee_schema import EmployeeRead
+from app.services.employee_service import search_employees_service
+from app.core.database import get_db
+from app.api.employee_param import EmployeeSearchParams
 
 router = APIRouter()
-
-
-class EmployeeSearchParams:
-    def __init__(
-        self,
-        status_id: Optional[int] = Query(None),
-        location_id: Optional[int] = Query(None),
-        department_id: Optional[int] = Query(None),
-        position_id: Optional[int] = Query(None),
-        company_id: Optional[int] = Query(None),
-        page: int = Query(1, ge=1),
-        size: int = Query(20, ge=1, le=100)
-    ):
-        self.status_id = status_id
-        self.location_id = location_id
-        self.department_id = department_id
-        self.position_id = position_id
-        self.company_id = company_id
-        self.page = page
-        self.size = size
-
 
 @router.get("/employees/search", response_model=List[EmployeeRead])
 def search_employees(

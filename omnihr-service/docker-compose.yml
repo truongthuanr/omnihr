@@ -1,21 +1,19 @@
-version: '3.9'
-
+# docker-compose.yml
 services:
   omnihr:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: truongthuanr/omnihr:latest
-    container_name: omnihr_service
+    container_name: omnihr-service
     ports:
       - "8000:8000"
-    env_file:
-      - .env
     restart: always
-    depends_on:
-      - omnihrdb
     environment:
       DB_HOST: omnihrdb
       DB_PORT: 3306
       DB_USER: root
-      DB_PASSWORD: secret
+      DB_PASSWORD: root
       DB_NAME: omnihr
     networks:
       - omnihr-net

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
-from app.models.model import Employee
 from typing import List, Optional
+
+from app.models.model import Employee
 
 
 class EmployeeRepository:
@@ -41,15 +41,6 @@ class EmployeeRepository:
         self.db.delete(employee)
         self.db.commit()
         return True
-
-from sqlalchemy.orm import Session
-from sqlalchemy import or_
-from typing import List, Optional
-from app.models.model import Employee
-
-class EmployeeRepository:
-    def __init__(self, db: Session):
-        self.db = db
 
     def search(
         self,
