@@ -1,46 +1,70 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.models.model import Employee
 from typing import List, Optional
 
 
-def get_employee(db: Session, employee_id: int) -> Optional[Employee]:
-    return db.query(Employee).filter(Employee.id == employee_id).first()
+class EmployeeRepository:
+    def __init__(self, db: Session):
+        self.db = db
 
+    def get(self, employee_id: int) -> Optional[Employee]:
+        return self.db.query(Employee).filter(Employee.id == employee_id).first()
 
-def get_employees(
-    db: Session,
-    skip: int = 0,
-    limit: int = 100
-) -> List[Employee]:
-    return db.query(Employee).offset(skip).limit(limit).all()
+    def list(self, skip: int = 0, limit: int = 100) -> List[Employee]:
+        return self.db.query(Employee).offset(skip).limit(limit).all()
 
+    def create(self, employee_data: dict) -> Employee:
+        employee = Employee(**employee_data)
+        self.db.add(employee)
+        self.db.commit()
+        self.db.refresh(employee)
+        return employee
 
-def create_employee(db: Session, employee_data: dict) -> Employee:
-    employee = Employee(**employee_data)
-    db.add(employee)
-    db.commit()
-    db.refresh(employee)
-    return employee
+    def update(self, employee_id: int, update_data: dict) -> Optional[Employee]:
+        employee = self.get(employee_id)
+        if not employee:
+            return None
 
+        for key, value in update_data.items():
+            setattr(employee, key, value)
 
-def update_employee(db: Session, employee_id: int, update_data: dict) -> Optional[Employee]:
-    employee = get_employee(db, employee_id)
-    if not employee:
-        return None
+        self.db.commit()
+        self.db.refresh(employee)
+        return employee
 
-    for key, value in update_data.items():
-        setattr(employee, key, value)
+    def delete(self, employee_id: int) -> bool:
+        employee = self.get(employee_id)
+        if not employee:
+            return False
 
-    db.commit()
-    db.refresh(employee)
-    return employee
+        self.db.delete(employee)
+        self.db.commit()
+        return True
 
+    def search(
+        self,
+        company_id: int,
+        filters: dict,
+        skip: int = 0,
+        limit: int = 100
+    ) -> List[Employee]:
+        query = self.db.query(Employee).filter(Employee.company_id == company_id)
 
-def delete_employee(db: Session, employee_id: int) -> bool:
-    employee = get_employee(db, employee_id)
-    if not employee:
-        return False
+        if name := filters.get("name"):
+            query = query.filter(
+                or_(
+                    Employee.first_name.ilike(f"%{name}%"),
+                    Employee.last_name.ilike(f"%{name}%")
+                )
+            )
+        if department_id := filters.get("department_id"):
+            query = query.filter(Employee.department_id == department_id)
+        if position_id := filters.get("position_id"):
+            query = query.filter(Employee.position_id == position_id)
+        if location_id := filters.get("location_id"):
+            query = query.filter(Employee.location_id == location_id)
+        if status_id := filters.get("status_id"):
+            query = query.filter(Employee.status_id == status_id)
 
-    db.delete(employee)
-    db.commit()
-    return True
+        return query.offset(skip).limit(limit).all()
