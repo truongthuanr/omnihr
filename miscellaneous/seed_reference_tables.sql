@@ -1,3 +1,8 @@
+INSERT INTO statuses (id, name) VALUES
+(1, 'active'),
+(2, 'not_started'),
+(3, 'terminated');
+
 INSERT INTO departments (name) VALUES
     ('Engineering'),
     ('Marketing'),

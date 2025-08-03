@@ -1,3 +1,6 @@
+# Note: 
+# How to run: python ./generate_employee.py --count 10000 --batch 1000 --out ./employees.sql
+
 import random
 import argparse
 from faker import Faker

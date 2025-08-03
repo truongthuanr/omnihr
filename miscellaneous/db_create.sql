@@ -19,9 +19,10 @@ CREATE TABLE locations (
 );
 
 CREATE TABLE statuses (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name ENUM('active', 'not_started', 'terminated') UNIQUE NOT NULL
+    id INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
 );
+
 
 CREATE TABLE employees (
     id INT AUTO_INCREMENT PRIMARY KEY,
