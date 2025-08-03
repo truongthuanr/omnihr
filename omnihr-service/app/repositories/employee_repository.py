@@ -42,22 +42,25 @@ class EmployeeRepository:
         self.db.commit()
         return True
 
+from sqlalchemy.orm import Session
+from sqlalchemy import or_
+from typing import List, Optional
+from app.models.model import Employee
+
+class EmployeeRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
     def search(
         self,
-        company_id: int,
         filters: dict,
         skip: int = 0,
         limit: int = 100
     ) -> List[Employee]:
-        query = self.db.query(Employee).filter(Employee.company_id == company_id)
+        query = self.db.query(Employee)
 
-        if name := filters.get("name"):
-            query = query.filter(
-                or_(
-                    Employee.first_name.ilike(f"%{name}%"),
-                    Employee.last_name.ilike(f"%{name}%")
-                )
-            )
+        if company_id := filters.get("company_id"):
+            query = query.filter(Employee.company_id == company_id)
         if department_id := filters.get("department_id"):
             query = query.filter(Employee.department_id == department_id)
         if position_id := filters.get("position_id"):
@@ -68,3 +71,4 @@ class EmployeeRepository:
             query = query.filter(Employee.status_id == status_id)
 
         return query.offset(skip).limit(limit).all()
+
