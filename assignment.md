@@ -1,97 +1,63 @@
-# Backend Assignment 2
+# Backend Assignment #2
 
-## 📄 Assignment Goal
+This is a technical assignment for the scope of senior backend engineer
 
-Implement a RESTful API for an Employee Management System using Python (FastAPI is preferred).  
-The goal is to demonstrate your ability to design and implement a backend API with clean architecture, proper validation, and good documentation.
+# Overview
 
----
+The task is to write a simple **django** / **fast-api** microservice for an HR company . You would be responsible for building the API that populates the employee search directory .
 
-## ✅ Requirements
+![Screenshot 2023-10-27 at 8.12.57 PM.png](/references/assignment1.webp)
 
-You are required to implement:
+Feel free to create entities and their attributes as you like in the relational DB .   
 
-### 1. CRUD APIs for Employee
+> 💡 Only the search API has to be implemented . Please ignore the `Add employee` `Import` `Export` CTA
 
-Each employee has:
+> 💡 You are only required to implement the search API . You do not have to implement crud API for any of the entities
 
-- `id` (auto increment)
-- `full_name`
-- `email` (unique)
-- `phone_number`
-- `join_date`
-- `job_title`
-- `department`
-- `salary`
+The following are the filter options of the API .
 
-### 2. Search & filter employee list
+![Screenshot 2023-10-27 at 8.44.39 PM.png](/references/assignment2.webp)
 
-Allow filtering with:
+The following are the responsibilities of the search API 
 
-- `department`
-- `job_title`
-- `date range of join_date`
-- Partial match for `full_name`
+### Dynamic columns :
 
-### 3. Sort employee list
+Different organisations will love to have different columns in the output , while the above example displays `contact info` `department` `location` `position` . Some organizations would love to display the `department` `location` `position` columns only . So you can assume the order , the columns are configurable at an organization level .
 
-Allow sorting by:
+> 💡 you do not have to create crud api to store the configuration of columns for the organizations . Assume it’s stored in configuration of your choice ( DB / file / etc )
 
-- `full_name`
-- `join_date`
-- `salary`
+### Performance :
 
-Sorting should support both ASC & DESC orders.
+Please assume that there are millions of users in the database , so do design the API considering the heavy load that could be placed on the API ( after sharding etc )
 
-### 4. Pagination
+### Rate-limitting
 
-Support pagination with `limit` and `offset` query parameters.
+We do not want users abusing the API , so please create an appropriate rate-limiting system as possible to prevent the user from spamming the API
 
----
+# Deliverables
 
-## 📚 Optional Bonus
+**The following are things to include in your submission**:
 
-- Use of **Docker** to run the application
-- **Unit tests**
-- Proper **schema validation** using Pydantic
-- **Database migrations** (with Alembic or similar)
-- API documentation (Swagger UI is built-in with FastAPI)
+- Link to your Github repository containing all code and toolings needed to install and run your CLI tool
+- A `README.md` file containing anything you think is important to know **for a potential end-user** (likely a fellow developer). Assume use of a unix environment (mac/linux)
 
----
+**The following are functional requirements**
 
-## 🧪 Technical Requirements
+- The service must be containerized .
+- The API information must be sharable in an **OPEN API** format
+- The API must be unit tested
+- No external library is allowed for rate-limitting . Please your own implementation no matter how naive it is .
+- There shouldn’t be a data leak in the API such ( information of other organisation’s  users , extra attributes of user that is not displayed on the UI etc ) .
+- The assignment must be in python / fast API
 
-- Language: **Python 3.9+**
-- Framework: **FastAPI** (or Flask if preferred)
-- DB: **PostgreSQL** or **SQLite** (for simplicity)
-- ORM: **SQLAlchemy** or **Tortoise ORM**
-- Structure: Follow best practices with proper **project structure**, **models**, **services**, **routers**, etc.
+> 💡 there is no need to create the relations in migration etc . Please stick to focusing as much time on the API as possible
 
----
+**The following are the non-functional requirements**:
 
-## 🚀 How to Submit
+- You may not use any external dependencies or libraries (only standard library is allowed)
+- You may use external testing libraries if you choose to write tests
+- The application should execute correctly in a Linux (or UNIX-like) environment
 
-- Push your code to a **public GitHub repository**
-- Include a **README** with instructions on:
-  - How to run your project
-  - How to use/test the API (example curl or Postman)
-  - Any design decisions or assumptions
+# Final notes
 
----
-
-## 🧠 Evaluation Criteria
-
-- Code quality and readability
-- API design and validation
-- Clean architecture and separation of concerns
-- Correctness and completeness of features
-- Use of best practices and tools (e.g., linting, typing)
-- Documentation and ease of use
-
----
-
-## 📝 Notes
-
-- Do not over-engineer. Keep it simple, but clean.
-- You can use a simple in-memory database or SQLite for quick setup.
-- Focus on showcasing your understanding of backend design.
+If we find your submission of sufficient quality, we will have a further discussion on your code architecture as well as pair to modify your code to simulate a real-world situation where stakeholders will require constant change/feature upgrades. So don't copy and paste too much

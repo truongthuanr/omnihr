@@ -1,0 +1,19 @@
+services:
+  omnihrdb:
+    image: mysql:8.0
+    container_name: omnihrdb-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: omnihr-db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+
+networks:
+  omnihr-net:
+    external: true
