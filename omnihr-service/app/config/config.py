@@ -43,6 +43,7 @@ class Config:
         if now - self._last_load > self._ttl:
             logger.info(f"Loading configuration from file {self._path}")
             self._load()
+            self._last_load = now
         else:
             logger.info(f"Use cache configuration, no loading.")
 

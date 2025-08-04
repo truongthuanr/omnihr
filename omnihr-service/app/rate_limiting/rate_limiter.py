@@ -3,24 +3,28 @@ from fastapi import Request, HTTPException
 from functools import wraps
 import inspect
 
+from app.servicelog.servicelog import logger
+
 def rate_limited(rate_limiter):
-    # func: router handler function
     def decorator(func):
         @wraps(func)
-        # *args, **kwargs: wrap from router handler function.
         async def wrapper(*args, **kwargs):
-            # Get request param from router kwargs
             request: Request = kwargs.get("request")
             if not request:
-                # if not found request from kwargs, find from arg
                 for arg in args:
                     if isinstance(arg, Request):
                         request = arg
                         break
-            # get host ip from request
+
             ip = request.client.host if request else "anonymous"
-            
-            # Handle both sync and async functions
+            logger.debug(f"[RateLimiter] Incoming request from IP: {ip}")
+
+            if not rate_limiter.is_allowed(ip):
+                logger.info(f"[RateLimiter] Rate limit exceeded for IP: {ip}")
+                raise HTTPException(status_code=429, detail="Rate limit exceeded")
+
+            logger.debug(f"[RateLimiter] Allowed IP: {ip}, proceeding to handler.")
+
             if inspect.iscoroutinefunction(func):
                 return await func(*args, **kwargs)
             else:
