@@ -1,5 +1,5 @@
 # api/employee_router.py
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from typing import List, Any
 
@@ -15,7 +15,7 @@ router = APIRouter()
 
 # 💡 Create limiter instance (per-IP + global limit)
 limiter = FixedWindowLimiter(
-    max_requests=5,            # per-IP limit
+    max_requests=10,           # per-IP limit
     window_seconds=60,         # window time
     max_global_requests=1000   # optional global limit across all clients
 )
@@ -23,6 +23,7 @@ limiter = FixedWindowLimiter(
 @router.get("/employees/search", response_model=List[dict[str, Any]])
 @rate_limited(limiter)
 def search_employees(
+    request: Request,
     params: EmployeeSearchParams = Depends(),
     db: Session = Depends(get_db)
 )-> List[dict[str, Any]]:
