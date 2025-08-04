@@ -1,12 +1,17 @@
 {
-    "columns": {
-      "id": true,
-      "first_name": true,
-      "last_name": true,
-      "contact": true,
-      "department": true,
-      "position": true,
-      "location": true,
-      "company": true
-    }
+  "columns": {
+    "id": false,
+    "first_name": true,
+    "last_name": true,
+    "contact": true,
+    "department": true,
+    "position": true,
+    "location": true,
+    "company": true
+  },
+  "rate_limit": {
+    "max_requests": 10,
+    "window_seconds": 60,
+    "max_global_requests": 1000
+  }
 }

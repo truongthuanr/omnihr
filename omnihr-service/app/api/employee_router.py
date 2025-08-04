@@ -10,15 +10,14 @@ from app.api.employee_param import EmployeeSearchParams
 from app.servicelog.servicelog import logger
 from app.rate_limiting.fixed_window import FixedWindowLimiter
 from app.rate_limiting.rate_limiter import rate_limited
+from app.config.config import Config
+
 
 router = APIRouter()
 
 # 💡 Create limiter instance (per-IP + global limit)
-limiter = FixedWindowLimiter(
-    max_requests=10,           # per-IP limit
-    window_seconds=60,         # window time
-    max_global_requests=1000   # optional global limit across all clients
-)
+# Limiter's configuration will be read from CONFIG_PATH
+limiter = FixedWindowLimiter()
 
 @router.get("/employees/search", response_model=List[dict[str, Any]])
 @rate_limited(limiter)

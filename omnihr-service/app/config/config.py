@@ -53,5 +53,15 @@ class Config:
         columns = self._cache.get("columns", {})
         merged = {**DEFAULT_COLUMNS, **columns}
         return [col for col, enabled in merged.items() if enabled]
+    
+    def get_rate_limit_config(self) -> dict:
+        self._load_if_needed()
+        rate_cfg = self._cache.get("rate_limit", {})
+        return {
+            "max_requests": rate_cfg.get("max_requests", 10),
+            "window_seconds": rate_cfg.get("window_seconds", 60),
+            "max_global_requests": rate_cfg.get("max_global_requests", 1000)
+        }
+    
 
 config = Config()
