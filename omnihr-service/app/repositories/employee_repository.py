@@ -50,8 +50,10 @@ class EmployeeRepository:
         skip: int = 0,
         limit: int = 100
     ) -> List[Employee]:
+        # TODO: get total + timeout.
         query = self.db.query(Employee)
 
+        # TODO: search by name
         if company_id := filters.get("company_id"):
             query = query.filter(Employee.company_id == company_id)
         if department_id := filters.get("department_id"):
