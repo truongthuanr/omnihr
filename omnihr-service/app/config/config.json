@@ -8,6 +8,11 @@
       "position": true,
       "location": true,
       "company": true
+    },
+    "rate_limit": {
+      "max_requests": 10,
+      "window_seconds": 60,
+      "max_global_requests": 1000
     }
   }
   

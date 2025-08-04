@@ -4,7 +4,7 @@ import sys
 
 def setup_logger(name: str = "omnihr") -> logging.Logger:
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     # Avoid to create if many handler
     if not logger.handlers:

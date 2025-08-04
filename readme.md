@@ -1,20 +1,53 @@
-# DATABASE
+## 🗄️ Database Setup
 
-MySQL
+This service uses **MySQL** as the database engine.
 
-## Create network
-```
-docker create network omnihr-net
-```
-## Create db
-* Start DB containers,  docker-compose.db.yml is put in ./miscellaneous
+### 1. Create Docker Network
+
+Create a dedicated Docker network to ensure isolated container communication:
 
 ```
-docker compose -f docker-compose.db.yml up -d
+docker network create omnihr-net
 ```
-* Init table: `./miscellaneous/db_create.sql`
-* Add test records to reference tables: `./miscellaneous/seed_reference_table.sql`
-* Add records to employee table: 
+
+### 2. Start Database Container
+
+The MySQL service is defined in the `docker-compose.db.yml` file located in the `./miscellaneous` directory.
+
+To start the database container:
+
+```
+docker compose -f ./miscellaneous/docker-compose.db.yml up -d
+```
+
+This will run MySQL with the proper volume, credentials, and network settings.
+
+### 3. Initialize Database Schema
+
+Execute the SQL script to create the required tables:
+
+```
+mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/db_create.sql
+```
+
+### 4. Seed Reference Data
+
+Populate reference data into the lookup tables (e.g., departments, positions, locations, statuses):
+
+```
+mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/seed_reference_table.sql
+```
+
+### 5. Seed Sample Employees (Optional)
+
+To populate the `employees` table with sample data for testing, use the following script:
+
+```
+mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/seed_employees.sql
+```
+
+> ℹ️ Replace credentials and database name (`omnihr`) accordingly if different in your setup.
+
 ***
 ***
 
@@ -95,3 +128,82 @@ Response:
 ```
 
 Only the columns marked as `true` in `columns` will appear in the response.
+
+
+## 🛡️ Rate Limiting
+
+The system uses a **Fixed Window Limiting** algorithm to control API request frequency, helping to protect backend resources and prevent abuse.
+
+### ✅ Supported Features
+
+- **Per-IP limiting**: Each client IP is tracked independently.
+- **Global limiting** *(optional)*: The total number of requests from all IPs within the window.
+- **Fixed window strategy**: Requests are counted in fixed-length time windows (e.g., every 60 seconds).
+- **Thread-safe**: Uses `threading.Lock` to ensure safety during concurrent access.
+- **Fallback `"anonymous"` IP**: If `request.client.host` is unavailable, the request is attributed to `"anonymous"`.
+
+---
+
+### ⚙️ How It Works
+
+1. On each request, the client IP is extracted from `request.client.host`. If not available, it is mapped to `"anonymous"`.
+2. For each IP:
+   - If the number of requests is below `max_requests` within `window_seconds` → accept and increment counter.
+   - If the limit is exceeded → return `429 Too Many Requests`.
+3. If `max_global_requests` is configured, the total count from all IPs is also checked.
+
+---
+
+### 🔧 Configuration
+
+Configuration is loaded from a `config.json` file or overridden using the `CONFIG_PATH` environment variable.
+
+Sample config structure:
+
+```json
+{
+  "rate_limit": {
+    "max_requests": 10,
+    "window_seconds": 60,
+    "max_global_requests": 1000
+  }
+}
+```
+
+- Default path: `/app/config/config.json`
+- Override with environment variable:
+
+```bash
+export CONFIG_PATH=/path/to/custom_config.json
+```
+
+The config is cached with a default TTL of 60 seconds.
+
+---
+
+### 🧩 Integration with FastAPI Router
+
+The rate limiter is applied via a decorator pattern.
+
+**1. Initialize limiter from config:**
+
+```python
+from app.config.config import get_config
+from app.rate_limiting.fixed_window import FixedWindowLimiter
+
+# 💡 Create limiter instance (per-IP + global limit)
+# Limiter's configuration will be read from CONFIG_PATH
+limiter = FixedWindowLimiter()
+```
+
+**2. Apply to route using decorator:**
+
+```python
+from app.rate_limiting.rate_limiter import rate_limited
+
+@router.get("/employees/search")
+@rate_limited(rate_limiter)
+async def search_employees(...):
+    ...
+```
+
