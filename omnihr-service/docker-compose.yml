@@ -9,7 +9,10 @@ services:
     ports:
       - "8000:8000"
     restart: always
+    volumes:
+      - ./configs/customconfig.json:/configs/config.json
     environment:
+      CONFIG_PATH: /configs/config.json
       DB_HOST: omnihrdb
       DB_PORT: 3306
       DB_USER: root
