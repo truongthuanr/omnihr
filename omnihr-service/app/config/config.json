@@ -1,0 +1,13 @@
+{
+    "columns": {
+      "id": false,
+      "first_name": true,
+      "last_name": true,
+      "contact": true,
+      "department": true,
+      "position": true,
+      "location": true,
+      "company": true
+    }
+  }
+  
