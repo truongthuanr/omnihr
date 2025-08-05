@@ -23,22 +23,41 @@ CREATE TABLE statuses (
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
+CREATE TABLE organizations (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE org_api_keys (
+    api_key VARCHAR(255) PRIMARY KEY,
+    organization_id INT NOT NULL,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+);
+
 
 CREATE TABLE employees (
     id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     contact VARCHAR(255), -- chứa email
+
     department_id INT,
     position_id INT,
     location_id INT,
     status_id INT,
     company_id INT,
+    organization_id INT NOT NULL,
+    internal_note TEXT,           
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (department_id) REFERENCES departments(id),
     FOREIGN KEY (position_id) REFERENCES positions(id),
     FOREIGN KEY (location_id) REFERENCES locations(id),
     FOREIGN KEY (status_id) REFERENCES statuses(id),
-    FOREIGN KEY (company_id) REFERENCES companies(id)
+    FOREIGN KEY (company_id) REFERENCES companies(id),
+    FOREIGN KEY (organization_id) REFERENCES organizations(id)
 );
