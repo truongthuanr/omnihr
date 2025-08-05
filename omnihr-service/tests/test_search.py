@@ -26,7 +26,6 @@ def override_get_db():
     finally:
         db.close()
 
-
 # Override FastAPI dependency BEFORE TestClient creation
 app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)

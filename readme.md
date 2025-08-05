@@ -1,77 +1,104 @@
-## 🗄️ Database Setup
+# 🧠 OmniHR — Employee Search Microservice
 
-This service uses **MySQL** as the database engine.
+A containerized, high-performance, FastAPI-based microservice that powers employee directory search for HR platforms.
 
-### 1. Create Docker Network
+---
 
-Create a dedicated Docker network to ensure isolated container communication:
+## 📦 Features
 
+- 🔍 Search API with advanced filters
+- 🧩 Dynamic column configuration (org-level visibility)
+- 🛡️ Built-in rate limiting (thread-safe, no 3rd party lib)
+- ⚡ Optimized for large-scale datasets
+- ✅ Fully unit tested
+- 🐳 Dockerized for easy deployment
+- 📄 OpenAPI support via `/docs`
+
+---
+
+## ⚙️ Tech Stack
+
+- Language: Python 3.11+
+- Framework: FastAPI
+- DB: MySQL
+- ORM: SQLAlchemy
+- Test: Pytest
+- Container: Docker, Docker Compose
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/truongthuanr/omnihr.git
+cd omnihr
 ```
+
+### 2. Create Docker Network
+
+```bash
 docker network create omnihr-net
 ```
 
-### 2. Start Database Container
+### 3. Start Database
 
-The MySQL service is defined in the `docker-compose.db.yml` file located in the `./miscellaneous` directory.
-
-To start the database container:
-
-```
+```bash
 docker compose -f ./miscellaneous/docker-compose.db.yml up -d
 ```
 
-This will run MySQL with the proper volume, credentials, and network settings.
+### 4. Initialize Database Schema
 
-### 3. Initialize Database Schema
-
-Execute the SQL script to create the required tables:
-
-```
+```bash
 mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/db_create.sql
 ```
 
-### 4. Seed Reference Data
+### 5. Seed Reference Data
 
-Populate reference data into the lookup tables (e.g., departments, positions, locations, statuses):
-
-```
+```bash
 mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/seed_reference_table.sql
 ```
 
-### 5. Seed Sample Employees (Optional)
+### 6. (Optional) Seed Sample Employees
 
-To populate the `employees` table with sample data for testing, use the following script:
-
-```
+```bash
 mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/seed_employees.sql
 ```
 
-> ℹ️ Replace credentials and database name (`omnihr`) accordingly if different in your setup.
+---
 
-***
-***
+## 🖥️ Run the Service
 
-# SERVICE
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
 
-### 🔧 Dynamic Column Configuration
+Access API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-The search API supports **organization-level customization** of which employee fields should be returned in the response.
+---
 
-#### 📌 Feature Description
+## 🧪 Run Tests
 
-Different organizations may prefer to display different subsets of employee attributes in their search result. For example:
+```bash
+pytest tests/
+```
 
-- Org A may require full details: `first_name`, `last_name`, `contact`, `department`, `position`, `location`, `company`
-- Org B may hide sensitive fields like `contact` or `company`
+Ensure DB is up and seeded before running tests.
 
-This behavior is configured via a **JSON-based column config file**, which defines visible fields in the response. If no custom configuration is found, the service falls back to a default schema.
+---
 
-#### 🧾 Example Configuration File
+## 🛠️ Configuration
 
-`configs/customconfig.json`
+All configuration is JSON-based and loaded via `CONFIG_PATH` (default: `/app/config/config.json`).
 
 ```json
 {
+  "rate_limit": {
+    "max_requests": 10,
+    "window_seconds": 60,
+    "max_global_requests": 1000
+  },
   "columns": {
     "id": true,
     "first_name": true,
@@ -85,22 +112,25 @@ This behavior is configured via a **JSON-based column config file**, which defin
 }
 ```
 
-#### ⚙️ Implementation Notes
+Override with:
 
-- The service reads this config from a path specified via the `CONFIG_PATH` environment variable.
-- Configuration is **cached in memory** using a TTL mechanism to reduce I/O overhead.
-- Any attribute marked `false` will be excluded from the serialized response.
-- No configuration CRUD API is implemented, as per assignment constraints.
-
-#### 📤 Example Response Based on Above Config
-
-Request:
-
-```
-GET /employees/search?status_id=1&location_id=1&department_id=1&page=1&size=20
+```bash
+export CONFIG_PATH=/custom/path/to/config.json
 ```
 
-Response:
+Config is cached in memory with default TTL = 60 seconds.
+
+---
+
+## 🔧 Dynamic Column Configuration
+
+Organizations can customize which fields appear in search result responses.
+
+- Configurable via JSON
+- Controlled by `columns` flags (`true`/`false`)
+- Supports fallback to default if no config provided
+
+### 📤 Sample API Response
 
 ```json
 [
@@ -113,7 +143,69 @@ Response:
     "position": "UX/UI Designer",
     "location": "United States",
     "company": "Zorg Industries"
-  },
+  }
+]
+```
+
+---
+
+## 🛡️ Rate Limiting
+
+Custom implementation of **Fixed Window Limiting** using `threading.Lock`.
+
+### ✅ Supported Features
+
+- Per-IP rate limit
+- Optional global limit
+- Thread-safe (using Lock)
+- Configurable via JSON
+- `"anonymous"` fallback for unknown IPs
+
+### ⚙️ How It Works
+
+- Count requests by IP in fixed time windows
+- Reject (`429`) if limit is exceeded
+- Decorator-based integration with routers
+
+### 🧩 FastAPI Integration
+
+```python
+from app.rate_limiting.rate_limiter import rate_limited
+from app.rate_limiting.fixed_window import FixedWindowLimiter
+
+limiter = FixedWindowLimiter()
+
+@router.get("/employees/search")
+@rate_limited(limiter)
+async def search_employees(...):
+    ...
+```
+
+---
+
+## 📬 API Example
+
+**Endpoint**: `/employees/search`
+
+**Query Params**:
+- `status_id`
+- `location_id`
+- `department_id`
+- `position_id`
+- `company_id`
+- `page`
+- `size`
+
+**Sample Request:**
+
+```bash
+curl -X GET "http://localhost:8000/employees/search?status_id=1&location_id=1&page=1&size=20"
+```
+
+**Sample Response**:
+
+```json
+[
   {
     "id": 4713,
     "first_name": "Abigail",
@@ -127,83 +219,38 @@ Response:
 ]
 ```
 
-Only the columns marked as `true` in `columns` will appear in the response.
-
-
-## 🛡️ Rate Limiting
-
-The system uses a **Fixed Window Limiting** algorithm to control API request frequency, helping to protect backend resources and prevent abuse.
-
-### ✅ Supported Features
-
-- **Per-IP limiting**: Each client IP is tracked independently.
-- **Global limiting** *(optional)*: The total number of requests from all IPs within the window.
-- **Fixed window strategy**: Requests are counted in fixed-length time windows (e.g., every 60 seconds).
-- **Thread-safe**: Uses `threading.Lock` to ensure safety during concurrent access.
-- **Fallback `"anonymous"` IP**: If `request.client.host` is unavailable, the request is attributed to `"anonymous"`.
-
 ---
 
-### ⚙️ How It Works
+## 📂 Project Structure
 
-1. On each request, the client IP is extracted from `request.client.host`. If not available, it is mapped to `"anonymous"`.
-2. For each IP:
-   - If the number of requests is below `max_requests` within `window_seconds` → accept and increment counter.
-   - If the limit is exceeded → return `429 Too Many Requests`.
-3. If `max_global_requests` is configured, the total count from all IPs is also checked.
+```
+omnihr/
+├── app/
+│   ├── main.py
+│   ├── api/
+│   ├── models/
+│   ├── db/
+│   ├── config/
+│   ├── rate_limiting/
+│   └── ...
+├── tests/
+├── miscellaneous/
+│   ├── docker-compose.db.yml
+│   ├── db_create.sql
+│   ├── seed_reference_table.sql
+│   └── seed_employees.sql
+└── README.md
+```
 
 ---
+<!-- 
+## ✅ Assignment Compliance
 
-### 🔧 Configuration
-
-Configuration is loaded from a `config.json` file or overridden using the `CONFIG_PATH` environment variable.
-
-Sample config structure:
-
-```json
-{
-  "rate_limit": {
-    "max_requests": 10,
-    "window_seconds": 60,
-    "max_global_requests": 1000
-  }
-}
-```
-
-- Default path: `/app/config/config.json`
-- Override with environment variable:
-
-```bash
-export CONFIG_PATH=/path/to/custom_config.json
-```
-
-The config is cached with a default TTL of 60 seconds.
-
----
-
-### 🧩 Integration with FastAPI Router
-
-The rate limiter is applied via a decorator pattern.
-
-**1. Initialize limiter from config:**
-
-```python
-from app.config.config import get_config
-from app.rate_limiting.fixed_window import FixedWindowLimiter
-
-# 💡 Create limiter instance (per-IP + global limit)
-# Limiter's configuration will be read from CONFIG_PATH
-limiter = FixedWindowLimiter()
-```
-
-**2. Apply to route using decorator:**
-
-```python
-from app.rate_limiting.rate_limiter import rate_limited
-
-@router.get("/employees/search")
-@rate_limited(rate_limiter)
-async def search_employees(...):
-    ...
-```
-
+- [x] Search API implemented (no CRUD)
+- [x] Dynamic columns via config
+- [x] Rate limiting implemented manually (no external libs)
+- [x] No data leakage across organizations
+- [x] Unit tests included
+- [x] OpenAPI docs available
+- [x] Fully containerized
+ -->
