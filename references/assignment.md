@@ -6,7 +6,7 @@ This is a technical assignment for the scope of senior backend engineer
 
 The task is to write a simple **django** / **fast-api** microservice for an HR company . You would be responsible for building the API that populates the employee search directory .
 
-![Screenshot 2023-10-27 at 8.12.57 PM.png](/references/assignment1.webp)
+![Screenshot 2023-10-27 at 8.12.57 PM.png](./assignment1.webp)
 
 Feel free to create entities and their attributes as you like in the relational DB .   
 
@@ -16,7 +16,7 @@ Feel free to create entities and their attributes as you like in the relational 
 
 The following are the filter options of the API .
 
-![Screenshot 2023-10-27 at 8.44.39 PM.png](/references/assignment2.webp)
+![Screenshot 2023-10-27 at 8.44.39 PM.png](./assignment2.webp)
 
 The following are the responsibilities of the search API 
 
