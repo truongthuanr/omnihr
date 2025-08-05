@@ -52,9 +52,9 @@ class EmployeeRepository:
         limit: int = 100
     ) -> List[Employee]:
         # TODO: get total + timeout.
+
         query = self.db.query(Employee)
 
-        # TODO: search by name
         if company_id := filters.get("company_id"):
             query = query.filter(Employee.company_id == company_id)
         if department_id := filters.get("department_id"):
@@ -66,6 +66,7 @@ class EmployeeRepository:
         if status_id := filters.get("status_id"):
             query = query.filter(Employee.status_id == status_id)
 
+        # TODO: more search algo
         if name := filters.get("name"):
             name = name.lower()
             query = query.filter(

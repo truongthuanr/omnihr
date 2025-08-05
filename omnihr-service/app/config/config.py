@@ -20,7 +20,6 @@ DEFAULT_COLUMNS = {
 
 class Config:
     def __init__(self, ttl: int = 60):
-        # TODO: if file not found, use the default config file.
         path = os.getenv("CONFIG_PATH", "/app/config/config.json")
         self._path = Path(path)
         self._ttl = ttl
