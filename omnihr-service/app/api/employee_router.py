@@ -19,7 +19,7 @@ router = APIRouter()
 # Limiter's configuration will be read from CONFIG_PATH
 limiter = FixedWindowLimiter()
 
-@router.get("/employees/search", response_model=List[dict[str, Any]])
+@router.get("/employees/search")
 @rate_limited(limiter)
 def search_employees(
     request: Request,
@@ -27,6 +27,5 @@ def search_employees(
     params: EmployeeSearchParams = Depends(),
     db: Session = Depends(get_db)
 )-> List[dict[str, Any]]:
-    # TODO: Exception handle
     logger.info(f"Receive request: param={params}")
-    return search_employees_service(params, db, x_org_key)
+    return search_employees_service(params, db, x_org_key) 

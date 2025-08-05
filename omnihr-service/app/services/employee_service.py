@@ -10,6 +10,7 @@ from app.repositories.origanization_repository import OrganizationRepository
 from app.servicelog.servicelog import logger
 from app.config.config import config
 from app.models.model import Employee
+from app.schemas.employee_schema import EmployeeRead
 
 def build_dynamic_field_response(employee: Employee) -> dict:
     output_fields = config.get_enabled_columns()
@@ -31,8 +32,8 @@ def build_dynamic_field_response(employee: Employee) -> dict:
     return result
 
 def search_employees_service(params: EmployeeSearchParams, db: Session, x_org_key: str):
+    logger.info("Service start handling request.")
     
-    logger.info(f"Service start handling request.")
     emp_repo = EmployeeRepository(db)
     org_repo = OrganizationRepository(db)
 
@@ -40,24 +41,42 @@ def search_employees_service(params: EmployeeSearchParams, db: Session, x_org_ke
     if not organization_id:
         raise HTTPException(status_code=403, detail="Invalid organization key")
 
-    filters = {k: v for k, v in {
-        "name": params.name,
-        "department_id": params.department_id,
-        "position_id": params.position_id,
-        "location_id": params.location_id,
-        "status_id": params.status_id,
-        "company_id": params.company_id,
-        "organization_id": organization_id
-    }.items() if v is not None}
+    filters = {
+        k: v for k, v in {
+            "name": params.name,
+            "department_id": params.department_id,
+            "position_id": params.position_id,
+            "location_id": params.location_id,
+            "status_id": params.status_id,
+            "company_id": params.company_id,
+            "organization_id": organization_id
+        }.items() if v is not None
+    }
 
     _skip = (params.page - 1) * params.size
     _limit = params.size
-    logger.info(f"Service send request to repository with filter={filters}, skip={_skip}, limit={_limit}")
 
-    employees =  emp_repo.search(
-        filters=filters,
-        skip=_skip,
-        limit=_limit
-    )
-    list_emp_response = [build_dynamic_field_response(emp) for emp in employees]
-    return list_emp_response
+    logger.info(f"Service send request to repository with filter={filters}, skip={_skip}, limit={_limit}")
+    employees = emp_repo.search(filters=filters, skip=_skip, limit=_limit)
+
+
+    included_fields = set(config.get_enabled_columns())
+
+    result = []
+    for emp in employees:
+        emp_data = {
+            "id": emp.id,
+            "first_name": emp.first_name,
+            "last_name": emp.last_name,
+            "contact": emp.contact,
+            "department": emp.department.name if emp.department else None,
+            "location": emp.location.name if emp.location else None,
+            "position": emp.position.name if emp.position else None,
+            "status": emp.status.name if emp.status else None,
+            "company": emp.company.name if emp.company else None,
+        }
+        result.append(
+            EmployeeRead(**emp_data).model_dump(include=included_fields)
+        )
+        
+    return result

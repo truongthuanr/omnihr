@@ -1,12 +1,12 @@
 {
   "columns": {
-    "id": false,
+    "id": true,
     "first_name": true,
     "last_name": true,
-    "contact": true,
-    "department": true,
+    "contact": false,
+    "department": false,
     "position": true,
-    "location": true,
+    "location": false,
     "company": true
   },
   "rate_limit": {

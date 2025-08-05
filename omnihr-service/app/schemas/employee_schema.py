@@ -31,10 +31,10 @@ class EmployeeRead(BaseModel):
     first_name: str
     last_name: str
     contact: Optional[str]
-    department: Optional[DepartmentRead]
-    location: Optional[LocationRead]
-    position: Optional[PositionRead]
-    status: Optional[StatusRead]
-    company: Optional[CompanyRead]
-
+    department: Optional[str]
+    location: Optional[str]
+    position: Optional[str]
+    status: Optional[str]
+    company: Optional[str]
+    
     model_config = ConfigDict(from_attributes=True)

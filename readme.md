@@ -8,13 +8,16 @@ A containerized, high-performance, FastAPI-based microservice that powers employ
 
 - 🔍 Search API with advanced filters
 - 🧩 Dynamic column configuration (org-level visibility)
-- 🛡️ Built-in rate limiting (thread-safe, no 3rd party lib)
+- 🔎 Strict response validation using Pydantic to prevent field-level data leakage
+- 🛡️ Organization-level access control: each organization can only access its own employee data (row-level isolation)
+- 🔐 Built-in rate limiting (thread-safe, no 3rd party lib)
 - ⚡ Optimized for large-scale datasets
 - ✅ Fully unit tested
 - 🐳 Dockerized for easy deployment
 - 📄 OpenAPI support via `/docs`
 
 ---
+
 
 ## ⚙️ Tech Stack
 
@@ -90,7 +93,25 @@ Ensure DB is up and seeded before running tests.
 
 ## 🛠️ Configuration
 
-All configuration is JSON-based and loaded via `CONFIG_PATH` (default: `/app/config/config.json`).
+This service supports organization-specific column configuration, read from a JSON config file.
+
+By default, the service reads config from a fixed path inside the container:
+
+```
+/configs/config.json
+```
+
+To provide custom configuration, mount your desired config file to this path using `docker-compose.yml`:
+
+```yaml
+services:
+  omnihr-api:
+    build: .
+    volumes:
+      - ./configs/org1_config.json:/configs/config.json
+    environment:
+      CONFIG_PATH: /configs/config.json
+```
 
 ```json
 {
@@ -110,12 +131,6 @@ All configuration is JSON-based and loaded via `CONFIG_PATH` (default: `/app/con
     "company": true
   }
 }
-```
-
-Override with:
-
-```bash
-export CONFIG_PATH=/custom/path/to/config.json
 ```
 
 Config is cached in memory with default TTL = 60 seconds.
@@ -180,6 +195,20 @@ limiter = FixedWindowLimiter()
 async def search_employees(...):
     ...
 ```
+---
+
+## 🔐 Response Validation & Data Leakage Prevention
+
+To ensure data isolation and prevent accidental exposure of internal fields (e.g., salary, notes, internal IDs), the API response is strictly validated using a defined `EmployeeRead` Pydantic schema.
+
+Even though the response supports **dynamic column configuration per organization**, all data is first validated against this schema before serialization. After validation, only allowed fields (as configured per org) are included in the final output using Pydantic's `.model_dump(include=...)`.
+
+This approach ensures:
+
+- ✅ Only whitelisted fields are returned per organization
+- ✅ Fields not defined in the schema can never be leaked, even if misconfigured
+- ✅ Full schema validation is still applied before serialization
+- ✅ Clean separation between dynamic response logic and schema safety
 
 ---
 ## 🔐 Multi-Organization Isolation & API Access Control
