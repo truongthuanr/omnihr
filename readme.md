@@ -8,13 +8,16 @@ A containerized, high-performance, FastAPI-based microservice that powers employ
 
 - 🔍 Search API with advanced filters
 - 🧩 Dynamic column configuration (org-level visibility)
-- 🛡️ Built-in rate limiting (thread-safe, no 3rd party lib)
+- 🔎 Strict response validation using Pydantic to prevent field-level data leakage
+- 🛡️ Organization-level access control: each organization can only access its own employee data (row-level isolation)
+- 🔐 Built-in rate limiting (thread-safe, no 3rd party lib)
 - ⚡ Optimized for large-scale datasets
 - ✅ Fully unit tested
 - 🐳 Dockerized for easy deployment
 - 📄 OpenAPI support via `/docs`
 
 ---
+
 
 ## ⚙️ Tech Stack
 
@@ -192,6 +195,20 @@ limiter = FixedWindowLimiter()
 async def search_employees(...):
     ...
 ```
+---
+
+## 🔐 Response Validation & Data Leakage Prevention
+
+To ensure data isolation and prevent accidental exposure of internal fields (e.g., salary, notes, internal IDs), the API response is strictly validated using a defined `EmployeeRead` Pydantic schema.
+
+Even though the response supports **dynamic column configuration per organization**, all data is first validated against this schema before serialization. After validation, only allowed fields (as configured per org) are included in the final output using Pydantic's `.model_dump(include=...)`.
+
+This approach ensures:
+
+- ✅ Only whitelisted fields are returned per organization
+- ✅ Fields not defined in the schema can never be leaked, even if misconfigured
+- ✅ Full schema validation is still applied before serialization
+- ✅ Clean separation between dynamic response logic and schema safety
 
 ---
 ## 🔐 Multi-Organization Isolation & API Access Control
