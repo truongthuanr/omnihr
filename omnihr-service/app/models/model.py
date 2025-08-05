@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, UniqueConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, Text, UniqueConstraint
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.sql import func
 
@@ -49,6 +49,25 @@ class Status(Base):
 
     employees = relationship("Employee", back_populates="status")
 
+class Organization(Base):
+    __tablename__ = "organizations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), unique=True, nullable=False)
+
+    employees = relationship("Employee", back_populates="organization")
+    api_keys = relationship("OrgApiKey", back_populates="organization", cascade="all, delete")
+
+class OrgApiKey(Base):
+    __tablename__ = "org_api_keys"
+
+    api_key = Column(String(255), primary_key=True)
+    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False)
+    description = Column(String(255))
+    created_at = Column(TIMESTAMP, server_default=func.now())
+
+    organization = relationship("Organization", back_populates="api_keys")
+
 
 class Employee(Base):
     __tablename__ = "employees"
@@ -63,6 +82,9 @@ class Employee(Base):
     location_id = Column(Integer, ForeignKey("locations.id"))
     status_id = Column(Integer, ForeignKey("statuses.id"))
     company_id = Column(Integer, ForeignKey("companies.id"))
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
+    internal_note = Column(Text)
+
 
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
 
@@ -71,3 +93,4 @@ class Employee(Base):
     location = relationship("Location", back_populates="employees")
     status = relationship("Status", back_populates="employees")
     company = relationship("Company", back_populates="employees")
+    organization = relationship("Organization", back_populates="employees")

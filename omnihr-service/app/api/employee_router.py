@@ -1,5 +1,5 @@
 # api/employee_router.py
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Header
 from sqlalchemy.orm import Session
 from typing import List, Any
 
@@ -23,9 +23,10 @@ limiter = FixedWindowLimiter()
 @rate_limited(limiter)
 def search_employees(
     request: Request,
+    x_org_key: str = Header(..., alias="X-ORG-KEY"),
     params: EmployeeSearchParams = Depends(),
     db: Session = Depends(get_db)
 )-> List[dict[str, Any]]:
     # TODO: Exception handle
     logger.info(f"Receive request: param={params}")
-    return search_employees_service(params, db)
+    return search_employees_service(params, db, x_org_key)

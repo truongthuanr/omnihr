@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_, func
 from typing import List, Optional
 from sqlalchemy.dialects import mysql
 
@@ -64,10 +65,16 @@ class EmployeeRepository:
             query = query.filter(Employee.location_id == location_id)
         if status_id := filters.get("status_id"):
             query = query.filter(Employee.status_id == status_id)
-        
+
+        if name := filters.get("name"):
+            name = name.lower()
+            query = query.filter(
+                or_(
+                    func.lower(Employee.first_name).like(f"%{name}%"),
+                    func.lower(Employee.last_name).like(f"%{name}%")
+                )
+            )
         _compiled = query.statement.compile(dialect=mysql.dialect(),compile_kwargs={"literal_binds": True})
-        logger.info(f"Create SQL: {_compiled}")
-                                                                                    
-                                                                                
+        logger.debug(f"Create SQL: {_compiled}")                                                                      
         return query.offset(skip).limit(limit).all()
 

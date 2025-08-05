@@ -6,6 +6,7 @@ from fastapi import Query
 class EmployeeSearchParams:
     def __init__(
         self,
+        name: Optional[str] = Query(None),
         status_id: Optional[int] = Query(None),
         location_id: Optional[int] = Query(None),
         department_id: Optional[int] = Query(None),
@@ -14,6 +15,7 @@ class EmployeeSearchParams:
         page: int = Query(1, ge=1),
         size: int = Query(20, ge=1, le=100)
     ):
+        self.name = name
         self.status_id = status_id
         self.location_id = location_id
         self.department_id = department_id
