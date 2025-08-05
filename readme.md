@@ -182,6 +182,41 @@ async def search_employees(...):
 ```
 
 ---
+## 🔐 Multi-Organization Isolation & API Access Control
+
+This service is designed to support multiple organizations (multi-tenant). To prevent **data leakage between organizations**, the following mechanisms are enforced:
+
+### ✅ API Key Based Access Control
+
+- Each organization is issued a unique `X-ORG-KEY` (API key), stored in the `org_api_keys` table.
+- All incoming API requests **must include** this key in the request header:
+
+  ```
+  X-ORG-KEY: key-omnihr-001
+  ```
+
+- The backend maps this API key to the correct `organization_id`, and enforces that all queries and data access are **restricted to that organization** only.
+
+### ✅ Data Isolation
+
+- All employee records are linked to an `organization_id`.
+- Any attempt to query across organizations is prevented at the **query layer**, regardless of input filters.
+<!-- - Fields like `internal_note` are treated as internal-only and **never exposed** in the API response. -->
+
+---
+
+### 🚧 Future Improvements (Authentication & Security)
+
+This current version uses simple API key authentication for isolation.
+
+In a production-grade system, this can be extended to:
+
+- 🔐 Replace `X-ORG-KEY` with **JWT-based authentication**, containing `organization_id` as a claim.
+- 🔄 Support OAuth2 flows or role-based access control (RBAC).
+- 🔍 Add **audit logging per organization**, tracking queries and access.
+- 📦 Cache API key lookups (e.g., using Redis) for performance.
+
+---
 
 ## 📬 API Example
 
