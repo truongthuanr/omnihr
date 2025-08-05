@@ -90,7 +90,25 @@ Ensure DB is up and seeded before running tests.
 
 ## 🛠️ Configuration
 
-All configuration is JSON-based and loaded via `CONFIG_PATH` (default: `/app/config/config.json`).
+This service supports organization-specific column configuration, read from a JSON config file.
+
+By default, the service reads config from a fixed path inside the container:
+
+```
+/configs/config.json
+```
+
+To provide custom configuration, mount your desired config file to this path using `docker-compose.yml`:
+
+```yaml
+services:
+  omnihr-api:
+    build: .
+    volumes:
+      - ./configs/org1_config.json:/configs/config.json
+    environment:
+      CONFIG_PATH: /configs/config.json
+```
 
 ```json
 {
@@ -110,12 +128,6 @@ All configuration is JSON-based and loaded via `CONFIG_PATH` (default: `/app/con
     "company": true
   }
 }
-```
-
-Override with:
-
-```bash
-export CONFIG_PATH=/custom/path/to/config.json
 ```
 
 Config is cached in memory with default TTL = 60 seconds.
