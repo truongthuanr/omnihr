@@ -10,7 +10,7 @@
     "company": true
   },
   "rate_limit": {
-    "max_requests": 10,
+    "max_requests": 60,
     "window_seconds": 60,
     "max_global_requests": 1000
   }

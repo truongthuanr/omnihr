@@ -42,6 +42,20 @@ INSERT INTO positions (name) VALUES
     ('Legal Counsel'),
     ('Finance Analyst');
 
+INSERT INTO organizations (id, name) VALUES
+    (1, 'OMNI HR'),
+    (2, 'Workday Inc.'),
+    (3, 'BambooHR'),
+    (4, 'SAP SuccessFactors'),
+    (5, 'ADP Workforce');
+
+INSERT INTO org_api_keys (api_key, organization_id, description) VALUES
+    ('key-omnihr-001', 1, 'API key for OMNI HR'),
+    ('key-workday-001', 2, 'API key for Workday Inc.'),
+    ('key-bamboohr-001', 3, 'API key for BambooHR'),
+    ('key-sap-001', 4, 'API key for SAP SuccessFactors'),
+    ('key-adp-001', 5, 'API key for ADP Workforce');
+
 INSERT INTO locations (name) VALUES
     ('United States'),
     ('Canada'),
