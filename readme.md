@@ -54,19 +54,19 @@ docker compose -f ./miscellaneous/docker-compose.db.yml up -d
 ### 4. Initialize Database Schema
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/db_create.sql
+mysql -h 127.0.0.1 -P 3307 -u root -p omnihr < ./miscellaneous/db_create.sql
 ```
 
 ### 5. Seed Reference Data
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/seed_reference_table.sql
+mysql -h 127.0.0.1 -P 3307 -u root -p omnihr < ./miscellaneous/seed_reference_table.sql
 ```
 
 ### 6. (Optional) Seed Sample Employees
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/seed_employees.sql
+mysql -h 127.0.0.1 -P 3307 -u root -p omnihr < ./miscellaneous/seed_employees.sql
 ```
 
 ---
