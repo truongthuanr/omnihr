@@ -54,19 +54,19 @@ docker compose -f ./miscellaneous/docker-compose.db.yml up -d
 ### 4. Initialize Database Schema
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/db_create.sql
+mysql -h 127.0.0.1 -P 3307 -u root -p omnihr < ./miscellaneous/db_create.sql
 ```
 
 ### 5. Seed Reference Data
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/seed_reference_table.sql
+mysql -h 127.0.0.1 -P 3307 -u root -p omnihr < ./miscellaneous/seed_reference_table.sql
 ```
 
 ### 6. (Optional) Seed Sample Employees
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p omnihr < ./miscellaneous/seed_employees.sql
+mysql -h 127.0.0.1 -P 3307 -u root -p omnihr < ./miscellaneous/seed_employees.sql
 ```
 
 ---
@@ -251,20 +251,27 @@ In a production-grade system, this can be extended to:
 
 **Endpoint**: `/employees/search`
 
-**Query Params**:
-- `status_id`
-- `location_id`
-- `department_id`
-- `position_id`
-- `company_id`
-- `page`
-- `size`
+**Query Parameters**:
+
+| Param         | Type     | Description                               |
+|---------------|----------|-------------------------------------------|
+| `name`        | string   | Filter by full name (first or last name)  |
+| `status_id`   | int      | Filter by employment status               |
+| `location_id` | int      | Filter by work location                   |
+| `department_id` | int    | Filter by department                      |
+| `position_id` | int      | Filter by job position                    |
+| `company_id`  | int      | Filter by company                         |
+| `page`        | int      | Page number (default: 1)                  |
+| `size`        | int      | Page size (default: 20, max: 100)         |
 
 **Sample Request:**
 
 ```bash
-curl -X GET "http://localhost:8000/employees/search?status_id=1&location_id=1&page=1&size=20"
+curl -X GET "http://localhost:8000/employees/search?name=John&status_id=1&location_id=3&department_id=1&position_id=1&company_id=1&page=1&size=20"
 ```
+
+> You can combine multiple filters together, e.g. search by name, location, and department.
+
 
 **Sample Response**:
 
