@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, Request, Header
 from sqlalchemy.orm import Session
 from typing import List, Any
 
-from app.schemas.employee_schema import EmployeeRead
-from app.services.employee_service import search_employees_service
+from app.schemas.employee_schema import EmployeeRead, PaginationResponse
+from app.services.employee_service import EmployeeService
 from app.core.database import get_db
 from app.api.employee_param import EmployeeSearchParams
 from app.servicelog.servicelog import logger
@@ -19,7 +19,7 @@ router = APIRouter()
 # Limiter's configuration will be read from CONFIG_PATH
 limiter = FixedWindowLimiter()
 
-@router.get("/employees/search")
+@router.get("/employees/search",response_model=PaginationResponse)
 @rate_limited(limiter)
 def search_employees(
     request: Request,
@@ -28,4 +28,6 @@ def search_employees(
     db: Session = Depends(get_db)
 )-> List[dict[str, Any]]:
     logger.info(f"Receive request: param={params}")
-    return search_employees_service(params, db, x_org_key) 
+    service = EmployeeService(db)
+    return service.search(params=params, x_org_key=x_org_key)
+ 
