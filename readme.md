@@ -276,18 +276,22 @@ curl -X GET "http://localhost:8000/employees/search?name=John&status_id=1&locati
 **Sample Response**:
 
 ```json
-[
-  {
-    "id": 4713,
-    "first_name": "Abigail",
-    "last_name": "Cuevas",
-    "contact": "abigail.cuevas@example.com",
-    "department": "Engineering",
-    "position": "Finance Analyst",
-    "location": "United States",
-    "company": "Zenith AI"
-  }
-]
+{
+    "page": 2,
+    "size": 20,
+    "total": 50,
+    "total_pages": 3,
+    "data": [
+        {
+            "id": 41140,
+            "first_name": "Vincent",
+            "last_name": "Johnson",
+            "position": "UX/UI Designer",
+            "company": "BLUTH Company"
+        },
+        ...
+    ]
+}
 ```
 
 ---

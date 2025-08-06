@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from sqlalchemy.dialects import mysql
 
 from app.models.model import Employee
@@ -50,7 +50,7 @@ class EmployeeRepository:
         filters: dict,
         skip: int = 0,
         limit: int = 100
-    ) -> List[Employee]:
+    ) -> Tuple[List[Employee], int]:
         # TODO: get total + timeout.
 
         query = self.db.query(Employee)
@@ -76,6 +76,8 @@ class EmployeeRepository:
                 )
             )
         _compiled = query.statement.compile(dialect=mysql.dialect(),compile_kwargs={"literal_binds": True})
-        logger.debug(f"Create SQL: {_compiled}")                                                                      
-        return query.offset(skip).limit(limit).all()
+        logger.debug(f"Create SQL: {_compiled}")        
+        total_count = query.count()
+        results =  query.offset(skip).limit(limit).all()                                                             
+        return results, total_count
 

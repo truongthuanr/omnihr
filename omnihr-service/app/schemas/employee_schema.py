@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import Optional, List 
 
 class DepartmentRead(BaseModel):
     id: int
@@ -38,3 +38,11 @@ class EmployeeRead(BaseModel):
     company: Optional[str]
     
     model_config = ConfigDict(from_attributes=True)
+
+
+class PaginationResponse(BaseModel):
+    page: int
+    size: int
+    total: int
+    total_pages: int
+    data: List[dict]
