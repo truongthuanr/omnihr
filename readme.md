@@ -145,23 +145,6 @@ Organizations can customize which fields appear in search result responses.
 - Controlled by `columns` flags (`true`/`false`)
 - Supports fallback to default if no config provided
 
-### 📤 Sample API Response
-
-```json
-[
-  {
-    "id": 2348,
-    "first_name": "Dorothy",
-    "last_name": "Bentley",
-    "contact": "dorothy.bentley@example.com",
-    "department": "Engineering",
-    "position": "UX/UI Designer",
-    "location": "United States",
-    "company": "Zorg Industries"
-  }
-]
-```
-
 ---
 
 ## 🛡️ Rate Limiting
@@ -253,16 +236,16 @@ In a production-grade system, this can be extended to:
 
 **Query Parameters**:
 
-| Param         | Type     | Description                               |
-|---------------|----------|-------------------------------------------|
-| `name`        | string   | Filter by full name (first or last name)  |
-| `status_id`   | int      | Filter by employment status               |
-| `location_id` | int      | Filter by work location                   |
-| `department_id` | int    | Filter by department                      |
-| `position_id` | int      | Filter by job position                    |
-| `company_id`  | int      | Filter by company                         |
-| `page`        | int      | Page number (default: 1)                  |
-| `size`        | int      | Page size (default: 20, max: 100)         |
+| Param            | Type     | Description                               |
+|------------------|----------|-------------------------------------------|
+| `name`           | string   | Filter by full name (first or last name)  |
+| `status_id`      | int      | Filter by employment status               |
+| `location_id`    | int      | Filter by work location                   |
+| `department_id`  | int      | Filter by department                      |
+| `position_id`    | int      | Filter by job position                    |
+| `company_id`     | int      | Filter by company                         |
+| `page`           | int      | Page number (default: 1)                  |
+| `size`           | int      | Page size (default: 20, max: 100)         |
 
 **Sample Request:**
 
