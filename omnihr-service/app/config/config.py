@@ -46,16 +46,32 @@ class Config:
         else:
             logger.info(f"Use cache configuration, no loading.")
 
-    def get_enabled_columns(self) -> list[str]:
-        logger.info(f"Getting configuration for output collumns.")
+    def _resolve_org_config(self, org_id: str | int | None) -> dict:
+        """
+        Resolve configuration for a given organization.
+        Supports:
+          - Backward compatibility with top-level keys.
+          - "default" section.
+          - "orgs" mapping whose keys are org ids/keys (stored as strings).
+        """
         self._load_if_needed()
-        columns = self._cache.get("columns", {})
+        raw_cfg = self._cache or {}
+        default_cfg = raw_cfg.get("default", raw_cfg)
+        org_cfg = {}
+        if org_id is not None:
+            org_cfg = raw_cfg.get("orgs", {}).get(str(org_id), {})
+        return {**default_cfg, **org_cfg}
+
+    def get_enabled_columns(self, org_id: str | int | None = None) -> list[str]:
+        logger.info(f"Getting configuration for output collumns.")
+        cfg = self._resolve_org_config(org_id)
+        columns = cfg.get("columns", {})
         merged = {**DEFAULT_COLUMNS, **columns}
         return [col for col, enabled in merged.items() if enabled]
     
-    def get_rate_limit_config(self) -> dict:
-        self._load_if_needed()
-        rate_cfg = self._cache.get("rate_limit", {})
+    def get_rate_limit_config(self, org_id: str | int | None = None) -> dict:
+        cfg = self._resolve_org_config(org_id)
+        rate_cfg = cfg.get("rate_limit", {})
         return {
             "max_requests": rate_cfg.get("max_requests", 10),
             "window_seconds": rate_cfg.get("window_seconds", 60),

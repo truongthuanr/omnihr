@@ -1,17 +1,45 @@
 {
-  "columns": {
-    "id": true,
-    "first_name": true,
-    "last_name": true,
-    "contact": false,
-    "department": false,
-    "position": true,
-    "location": false,
-    "company": true
+  "default": {
+    "columns": {
+      "id": true,
+      "first_name": true,
+      "last_name": true,
+      "contact": true,
+      "department": true,
+      "position": true,
+      "location": true,
+      "company": true
+    },
+    "rate_limit": {
+      "max_requests": 10,
+      "window_seconds": 60,
+      "max_global_requests": 1000
+    }
   },
-  "rate_limit": {
-    "max_requests": 10,
-    "window_seconds": 60,
-    "max_global_requests": 1000
+  "orgs": {
+    "1": {
+      "columns": {
+        "id": false,
+        "first_name": true,
+        "last_name": true,
+        "contact": false,
+        "department": true,
+        "position": true,
+        "location": true,
+        "company": false
+      }
+    },
+    "2": {
+      "columns": {
+        "id": false,
+        "first_name": true,
+        "last_name": true,
+        "contact": false,
+        "department": false,
+        "position": false,
+        "location": false,
+        "company": true
+      }
+    }
   }
 }
