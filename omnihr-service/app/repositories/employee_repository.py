@@ -78,6 +78,7 @@ class EmployeeRepository:
         _compiled = query.statement.compile(dialect=mysql.dialect(),compile_kwargs={"literal_binds": True})
         logger.debug(f"Create SQL: {_compiled}")        
         total_count = query.count()
+        # TODO: optimize count for large datasets.
         results =  query.offset(skip).limit(limit).all()                                                             
         return results, total_count
 
