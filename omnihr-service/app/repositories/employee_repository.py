@@ -64,7 +64,10 @@ class EmployeeRepository:
         if location_id := filters.get("location_id"):
             query = query.filter(Employee.location_id == location_id)
         if status_id := filters.get("status_id"):
-            query = query.filter(Employee.status_id == status_id)
+            if isinstance(status_id, list):
+                query = query.filter(Employee.status_id.in_(status_id))
+            else:
+                query = query.filter(Employee.status_id == status_id)
 
         # TODO: more search algo
         if name := filters.get("name"):
@@ -78,6 +81,7 @@ class EmployeeRepository:
         _compiled = query.statement.compile(dialect=mysql.dialect(),compile_kwargs={"literal_binds": True})
         logger.debug(f"Create SQL: {_compiled}")        
         total_count = query.count()
+        # TODO: optimize count for large datasets.
         results =  query.offset(skip).limit(limit).all()                                                             
         return results, total_count
 

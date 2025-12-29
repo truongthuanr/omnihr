@@ -1,13 +1,12 @@
 # api/employee_param.py
-from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from fastapi import Query
 
 class EmployeeSearchParams:
     def __init__(
         self,
         name: Optional[str] = Query(None),
-        status_id: Optional[int] = Query(None),
+        status_id: List[int] = Query(default_factory=list, description="Repeat to filter multiple statuses"),
         location_id: Optional[int] = Query(None),
         department_id: Optional[int] = Query(None),
         position_id: Optional[int] = Query(None),

@@ -19,8 +19,8 @@ class EmployeeService:
         self.org_repo = OrganizationRepository(db)
         self.config = config
 
-    def build_dynamic_field_response(self, employee: Employee) -> dict[str, Any]:
-        output_fields = self.config.get_enabled_columns()
+    def build_dynamic_field_response(self, employee: Employee, org_id: int | None = None) -> dict[str, Any]:
+        output_fields = self.config.get_enabled_columns(org_id)
         result = {}
 
         RELATIONSHIP_MAP = {
@@ -52,9 +52,8 @@ class EmployeeService:
                 "position_id": params.position_id,
                 "location_id": params.location_id,
                 "status_id": params.status_id,
-                "company_id": params.company_id,
-                "organization_id": organization_id
-            }.items() if v is not None
+                "company_id": params.company_id
+            }.items() if v is not None and (not isinstance(v, list) or len(v) > 0)
         }
 
         skip = (params.page - 1) * params.size
@@ -63,7 +62,7 @@ class EmployeeService:
         logger.info(f"Service send request to repository with filters={filters}, skip={skip}, limit={limit}")
         employees, total = self.emp_repo.search(filters=filters, skip=skip, limit=limit)
 
-        included_fields = set(self.config.get_enabled_columns())
+        included_fields = set(self.config.get_enabled_columns(organization_id))
 
         data = []
         for emp in employees:

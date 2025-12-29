@@ -1,0 +1,42 @@
+# docker-compose.yml
+services:
+  omnihr-db:
+    image: mysql:8.0
+    container_name: omnihr-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root  # change this from environment variable or secret in production
+      MYSQL_DATABASE: omnihr-db
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - omnihr-net
+
+  omnihr-service:
+    build:
+      context: ./omnihr-service
+      dockerfile: Dockerfile
+    image: truongthuanr/omnihr:latest
+    container_name: omnihr-service
+    ports:
+      - "8000:8000"
+    restart: always
+    volumes:
+      - ./omnihr-service/configs/customconfig.json:/configs/config.json
+    environment:
+      CONFIG_PATH: /configs/config.json
+      DB_HOST: omnihr-db
+      DB_PORT: 3306
+      DB_USER: root # environment variable or secret in production
+      DB_PASSWORD: root # environment variable or secret in production
+      DB_NAME: omnihr-db
+    networks:
+      - omnihr-net
+
+volumes:
+  db_data:
+
+networks:
+  omnihr-net:
