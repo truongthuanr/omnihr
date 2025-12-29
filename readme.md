@@ -1,4 +1,4 @@
-# 🧠 OmniHR — Employee Search Microservice
+# 🧠 OmniHR — Employee Search Microservice - Overview
 
 A containerized, high-performance, FastAPI-based microservice that powers employee directory search for HR platforms.
 
@@ -18,7 +18,6 @@ A containerized, high-performance, FastAPI-based microservice that powers employ
 
 ---
 
-
 ## ⚙️ Tech Stack
 
 - Language: Python 3.11+
@@ -32,6 +31,40 @@ A containerized, high-performance, FastAPI-based microservice that powers employ
 
 ## 🚀 Getting Started
 
+### Example Usage (Request and Response)
+Request:
+
+```bash
+curl -X 'GET' \
+  'http://localhost:8000/employees/search?status_id=2&page=1&size=2' \
+  -H 'accept: application/json' \
+  -H 'X-ORG-KEY: key-workday-001'
+```
+
+Response:
+
+```bash
+{
+  "page": 1,
+  "size": 2,
+  "total": 166473,
+  "total_pages": 83237,
+  "data": [
+    {
+      "first_name": "Christopher",
+      "last_name": "Romero",
+      "company": "Zion Technologies"
+    },
+    {
+      "first_name": "Max",
+      "last_name": "Frey",
+      "company": "Illuminati Holdings"
+    }
+  ]
+}
+```
+### Deploy
+
 ### 1. Clone Repository
 
 ```bash
@@ -39,45 +72,85 @@ git clone https://github.com/truongthuanr/omnihr.git
 cd omnihr
 ```
 
-### 2. Create Docker Network
-
+### Database
+- Start MySQL
 ```bash
-docker network create omnihr-net
+docker compose up -d omnihr-db
+```
+- Seed schema + sample data (run from repo root; `employees.sql` is large, import may take a bit)
+```bash
+docker compose exec -T omnihr-db mysql -uroot -proot omnihr-db < miscellaneous/db_create.sql
+docker compose exec -T omnihr-db mysql -uroot -proot omnihr-db < miscellaneous/seed_reference_tables.sql
+docker compose exec -T omnihr-db mysql -uroot -proot omnihr-db < miscellaneous/employees.sql
 ```
 
-### 3. Start Database
-
+### Service
+- Start API (after DB is up/seeding done)
 ```bash
-docker compose -f ./miscellaneous/docker-compose.db.yml up -d
+docker compose up -d omnihr-service
+```
+- Swagger UI: http://localhost:8000/docs
+- Sample request (uses seeded key)
+```bash
+curl -X 'GET' \
+  'http://localhost:8000/employees/search?status_id=2&page=1&size=2' \
+  -H 'accept: application/json' \
+  -H 'X-ORG-KEY: key-workday-001'
 ```
 
-### 4. Initialize Database Schema
+## Feature Details
+### Search API
+- Supports optional filters: name, status_id, location_id, company_id, department_id, and position_id (see `EmployeeSearchParams`).
+- Executes database queries based on the provided filters.
 
+### Dynamic Column Responses
+- Response columns are configurable and support multi-tenant overrides.
+- Configure defaults and per-organization settings in `omnihr-service\configs\customconfig.json`.
+
+Example default config:
 ```bash
-mysql -h 127.0.0.1 -P 3307 -u root -p omnihr < ./miscellaneous/db_create.sql
+"default": {
+    "columns": {
+      "id": true,
+      "first_name": true,
+      "last_name": true,
+      "contact": true,
+      "department": true,
+      "position": true,
+      "location": true,
+      "company": true
+    },
+    ...
 ```
 
-### 5. Seed Reference Data
-
+Example organization-specific config:
 ```bash
-mysql -h 127.0.0.1 -P 3307 -u root -p omnihr < ./miscellaneous/seed_reference_table.sql
+"orgs": {
+    "1": {
+      "columns": {
+        "id": false,
+        "first_name": true,
+        "last_name": true,
+        "contact": false,
+        "department": true,
+        "position": true,
+        "location": true,
+        "company": false
+      }
 ```
 
-### 6. (Optional) Seed Sample Employees
+### Rate Limiting
+- Implemented via a decorator pattern.
+- Uses a fixed-window strategy for both per-IP and global limiters.
+- Configuration lives in `omnihr-service\configs\customconfig.json`.
 
+Example configuration:
 ```bash
-mysql -h 127.0.0.1 -P 3307 -u root -p omnihr < ./miscellaneous/seed_employees.sql
+    "rate_limit": {
+      "max_requests": 10,
+      "window_seconds": 60,
+      "max_global_requests": 1000
 ```
-
----
-
-## 🖥️ Run the Service
-
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Access API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
@@ -90,7 +163,7 @@ pytest tests/
 Ensure DB is up and seeded before running tests.
 
 ---
-
+<!---
 ## 🛠️ Configuration
 
 This service supports organization-specific column configuration, read from a JSON config file.
@@ -229,7 +302,7 @@ In a production-grade system, this can be extended to:
 - 📦 Cache API key lookups (e.g., using Redis) for performance.
 
 ---
-
+<!---
 ## 📬 API Example
 
 **Endpoint**: `/employees/search`
@@ -276,7 +349,7 @@ curl -X GET "http://localhost:8000/employees/search?name=John&status_id=1&locati
     ]
 }
 ```
-
+--->
 ---
 
 ## 📂 Project Structure
