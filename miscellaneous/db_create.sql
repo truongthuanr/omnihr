@@ -49,7 +49,6 @@ CREATE TABLE employees (
     location_id INT,
     status_id INT,
     company_id INT,
-    organization_id INT NOT NULL,
     internal_note TEXT,           
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -58,6 +57,5 @@ CREATE TABLE employees (
     FOREIGN KEY (position_id) REFERENCES positions(id),
     FOREIGN KEY (location_id) REFERENCES locations(id),
     FOREIGN KEY (status_id) REFERENCES statuses(id),
-    FOREIGN KEY (company_id) REFERENCES companies(id),
-    FOREIGN KEY (organization_id) REFERENCES organizations(id)
+    FOREIGN KEY (company_id) REFERENCES companies(id)
 );

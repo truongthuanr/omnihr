@@ -58,13 +58,13 @@ def setup_database():
         Employee(
             first_name="John", last_name="Doe", contact="john@example.com",
             department_id=1, position_id=1, location_id=1,
-            status_id=1, company_id=1, organization_id=org.id,
+            status_id=1, company_id=1,
             internal_note="Internal test employee"
         ),
         Employee(
             first_name="Jane", last_name="Smith", contact="jane@example.com",
             department_id=2, position_id=2, location_id=2,
-            status_id=1, company_id=1, organization_id=org.id,
+            status_id=1, company_id=1,
             internal_note="Another note"
         )
     ])
