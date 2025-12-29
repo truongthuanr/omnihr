@@ -59,3 +59,11 @@ CREATE TABLE employees (
     FOREIGN KEY (status_id) REFERENCES statuses(id),
     FOREIGN KEY (company_id) REFERENCES companies(id)
 );
+
+-- Indexes to speed up common filters
+CREATE INDEX idx_employees_status_id ON employees(status_id);
+CREATE INDEX idx_employees_location_id ON employees(location_id);
+CREATE INDEX idx_employees_company_id ON employees(company_id);
+CREATE INDEX idx_employees_department_id ON employees(department_id);
+CREATE INDEX idx_employees_position_id ON employees(position_id);
+CREATE INDEX idx_employees_last_first_name ON employees(last_name, first_name);
