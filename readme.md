@@ -28,12 +28,35 @@ FastAPI microservice for employee directory search, built for multi-tenant HR pl
 
 ## 🚀 Getting Started
 
-### Quick Request Example
+### Quick Request Example\
+###### Request
 ```bash
 curl -X 'GET' \
   'http://localhost:8000/employees/search?status_id=1&status_id=2&location_id=3&department_id=4&position_id=2&page=1&size=20' \
   -H 'accept: application/json' \
   -H 'X-ORG-KEY: key-omnihr-001'
+```
+###### Response
+```bash
+{
+  "page": 1,
+  "size": 20,
+  "total": 21,
+  "total_pages": 2,
+  "data": [
+    {
+      "id": 17584,
+      "first_name": "Priscilla",
+      "last_name": "Stevenson",
+      "contact": "priscilla.stevenson@example.com",
+      "department": "Customer Support",
+      "location": "United Kingdom",
+      "position": "Backend Developer",
+      "status": "active",
+      "company": "Prestige Worldwide"
+    },
+    ...
+}
 ```
 
 ### Deploy
@@ -76,17 +99,19 @@ curl -X 'GET' \
 Default config example:
 ```bash
 "default": {
-  "columns": {
-    "id": true,
-    "first_name": true,
-    "last_name": true,
-    "contact": true,
-    "department": true,
-    "position": true,
-    "location": true,
-    "company": true
-  },
-  ...
+    "columns": {
+      "id": true,
+      "first_name": true,
+      "last_name": true,
+      "status": true,
+      "contact": true,
+      "department": true,
+      "position": true,
+      "location": true,
+      "company": true
+    }
+    ...
+}
 ```
 
 Org-specific example:
@@ -97,12 +122,14 @@ Org-specific example:
       "id": false,
       "first_name": true,
       "last_name": true,
+      "status": false,
       "contact": false,
       "department": true,
       "position": true,
       "location": true,
       "company": false
     }
+}
 ```
 
 ### Performance
