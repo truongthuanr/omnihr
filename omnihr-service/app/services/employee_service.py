@@ -53,7 +53,7 @@ class EmployeeService:
                 "location_id": params.location_id,
                 "status_id": params.status_id,
                 "company_id": params.company_id
-            }.items() if v is not None
+            }.items() if v is not None and (not isinstance(v, list) or len(v) > 0)
         }
 
         skip = (params.page - 1) * params.size

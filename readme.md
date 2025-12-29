@@ -31,9 +31,9 @@ FastAPI microservice for employee directory search, built for multi-tenant HR pl
 ### Quick Request Example
 ```bash
 curl -X 'GET' \
-  'http://localhost:8000/employees/search?status_id=2&page=1&size=2' \
+  'http://localhost:8000/employees/search?status_id=1&status_id=2&location_id=3&department_id=4&position_id=2&page=1&size=20' \
   -H 'accept: application/json' \
-  -H 'X-ORG-KEY: key-workday-001'
+  -H 'X-ORG-KEY: key-omnihr-001'
 ```
 
 ### Deploy
@@ -58,9 +58,9 @@ docker compose up -d omnihr-service
 - Sample request (seeded key):
 ```bash
 curl -X 'GET' \
-  'http://localhost:8000/employees/search?status_id=2&page=1&size=2' \
+  'http://localhost:8000/employees/search?status_id=1&status_id=2&location_id=3&department_id=4&position_id=2&page=1&size=20' \
   -H 'accept: application/json' \
-  -H 'X-ORG-KEY: key-workday-001'
+  -H 'X-ORG-KEY: key-omnihr-001'
 ```
 
 ---
