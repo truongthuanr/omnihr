@@ -93,6 +93,10 @@ curl -X 'GET' \
 - Optional filters: name, status_id, location_id, company_id, department_id, position_id (see `EmployeeSearchParams`).
 - Database queries executed based on provided filters.
 
+### Organization Scoping
+- Search is scoped by organization derived from `X-ORG-KEY` to prevent cross-tenant data leakage.
+- Organization filtering is enforced at query time.
+
 ### Dynamic Column Responses
 - Configurable per organization; fallback to defaults in `omnihr-service/configs/customconfig.json`.
 
