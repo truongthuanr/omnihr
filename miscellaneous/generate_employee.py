@@ -13,6 +13,7 @@ POSITION_COUNT = 20
 LOCATION_COUNT = 50
 STATUS_COUNT = 3
 COMPANY_COUNT = 98
+ORGANIZATION_COUNT = 5
 
 
 def sql_escape(value: str) -> str:
@@ -36,6 +37,7 @@ def generate_employees(n, firstnames, lastnames):
         location_id = random.randint(1, LOCATION_COUNT)
         status_id = random.randint(1, STATUS_COUNT)
         company_id = random.randint(1, COMPANY_COUNT)
+        organization_id = random.randint(1, ORGANIZATION_COUNT)
 
         # random text
         internal_note = sql_escape(faker.sentence(nb_words=6))
@@ -49,6 +51,7 @@ def generate_employees(n, firstnames, lastnames):
             location_id,
             status_id,
             company_id,
+            organization_id,
             internal_note
         )
 
@@ -60,13 +63,13 @@ def export_sql(filename: str, employees, batch_size: int):
             values = ", ".join(f"'{v}'" if isinstance(v, str) else str(v) for v in row)
             batch.append(f"({values})")
             if idx % batch_size == 0:
-                f.write("INSERT INTO employees (first_name, last_name, contact, department_id, position_id, location_id, status_id, company_id, internal_note) VALUES\n")
+                f.write("INSERT INTO employees (first_name, last_name, contact, department_id, position_id, location_id, status_id, company_id, organization_id, internal_note) VALUES\n")
                 f.write(",\n".join(batch))
                 f.write(";\n\n")
                 batch.clear()
 
         if batch:
-            f.write("INSERT INTO employees (first_name, last_name, contact, department_id, position_id, location_id, status_id, company_id, internal_note) VALUES\n")
+            f.write("INSERT INTO employees (first_name, last_name, contact, department_id, position_id, location_id, status_id, company_id, organization_id, internal_note) VALUES\n")
             f.write(",\n".join(batch))
             f.write(";\n")
 

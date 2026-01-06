@@ -55,6 +55,7 @@ class Organization(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), unique=True, nullable=False)
 
+    employees = relationship("Employee", back_populates="organization")
     api_keys = relationship("OrgApiKey", back_populates="organization", cascade="all, delete")
 
 class OrgApiKey(Base):
@@ -81,6 +82,7 @@ class Employee(Base):
     location_id = Column(Integer, ForeignKey("locations.id"))
     status_id = Column(Integer, ForeignKey("statuses.id"))
     company_id = Column(Integer, ForeignKey("companies.id"))
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
     internal_note = Column(Text)
 
 
@@ -91,3 +93,4 @@ class Employee(Base):
     location = relationship("Location", back_populates="employees")
     status = relationship("Status", back_populates="employees")
     company = relationship("Company", back_populates="employees")
+    organization = relationship("Organization", back_populates="employees")

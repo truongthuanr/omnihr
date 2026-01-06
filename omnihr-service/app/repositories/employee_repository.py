@@ -68,6 +68,8 @@ class EmployeeRepository:
                 query = query.filter(Employee.status_id.in_(status_id))
             else:
                 query = query.filter(Employee.status_id == status_id)
+        if organization_id := filters.get("organization_id"):
+            query = query.filter(Employee.organization_id == organization_id)
 
         # TODO: more search algo
         if name := filters.get("name"):

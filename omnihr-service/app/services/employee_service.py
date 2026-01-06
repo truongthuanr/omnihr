@@ -52,7 +52,8 @@ class EmployeeService:
                 "position_id": params.position_id,
                 "location_id": params.location_id,
                 "status_id": params.status_id,
-                "company_id": params.company_id
+                "company_id": params.company_id,
+                "organization_id": organization_id
             }.items() if v is not None and (not isinstance(v, list) or len(v) > 0)
         }
 
